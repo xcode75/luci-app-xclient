@@ -3,9 +3,6 @@ include $(TOPDIR)/rules.mk
 PKG_NAME:=luci-app-xclient
 PKG_VERSION:=v1.0.0
 PKG_MAINTAINER:=xcode75
-
-PKG_CONFIG_DEPENDS:= \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Xray_Plugin
 	
 include $(INCLUDE_DIR)/package.mk
 
@@ -20,13 +17,6 @@ define Package/$(PKG_NAME)
 endef
 
 define Package/$(PKG_NAME)/config
-menu "Configuration"
-
-config PACKAGE_$(PKG_NAME)_INCLUDE_Xray_Plugin
-	bool "Include Xray-Plugin (Shadowsocks Plugin)"
-	default y if aarch64||arm||i386||mips||mipsel||x86_64
-	
-endmenu	
 endef
 
 define Build/Configure
