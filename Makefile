@@ -13,7 +13,7 @@ define Package/$(PKG_NAME)
 	TITLE:=LuCI Support for Xray
 	PKGARCH:=all
 	MAINTAINER:=xcode75
-	DEPENDS:=+coreutils +coreutils-base64 +pdnsd-alt +coreutils-nohup +curl +dnsmasq-full +luci-compat +dns2socks +ipset +ip-full +iptables-mod-tproxy +libuci-lua +lua +luci-lib-jsonc +microsocks +tcping +resolveip +xray-core +shadowsocks-libev-ss-local +shadowsocks-libev-ss-redir +unzip +uclient-fetch +wget-ssl +libmbedtls
+	DEPENDS:=+coreutils +coreutils-base64 +pdnsd-alt +coreutils-nohup +curl +dnsmasq-full +luci-compat +dns2socks +ipset +ip-full +iptables-mod-tproxy +libuci-lua +lua +luci-lib-jsonc +microsocks +tcping +resolveip +shadowsocks-libev-ss-local +shadowsocks-libev-ss-redir +unzip +uclient-fetch +wget-ssl +libmbedtls
 endef
 
 define Package/$(PKG_NAME)/config
