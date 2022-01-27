@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-xclient
-PKG_VERSION:=v1.0.0
+PKG_VERSION:=v1.0.1
 PKG_MAINTAINER:=xcode75
 	
 include $(INCLUDE_DIR)/package.mk
@@ -40,6 +40,7 @@ if [ -z "$${IPKG_INSTROOT}" ]; then
 	  uci -q batch <<-EOF >/dev/null
 		delete firewall.xclient
 		commit firewall
+	chmod -R 777 /usr/share/xclient 2>/dev/null	
 EOF
 fi
 
@@ -55,6 +56,7 @@ if [ -z "$${IPKG_INSTROOT}" ]; then
 	mv /etc/config/xclient /etc/config/xclient.bak 2>/dev/null
 	rm -rf /usr/lib/lua/luci/model/cbi/xclient 2>/dev/null
 	rm -rf /usr/lib/lua/luci/view/xclient 2>/dev/null
+	chmod -R 777 /usr/share/xclient 2>/dev/null
 fi
 
 exit 0
@@ -71,8 +73,7 @@ if [ -z "$${IPKG_INSTROOT}" ]; then
 	chmod +x /etc/init.d/xclient 2>/dev/null
 	/etc/init.d/xclient disable 2>/dev/null
 	/etc/init.d/xclient stop 2>/dev/null
-	chmod +x /usr/bin/xrules 2>/dev/null
-	chmod +x /usr/bin/xmonitor 2>/dev/null
+	chmod -R 777 /usr/share/xclient 2>/dev/null
 fi
 
 exit 0

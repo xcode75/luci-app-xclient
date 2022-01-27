@@ -53,6 +53,7 @@ function index()
 	entry({"admin", "services", "xclient", "check_geosite"}, call("check_geosite_log")).leaf=true
 	
 	entry({"admin", "services", "xclient", "version"}, call("check_version")).leaf=true
+	entry({"admin", "services", "xclient", "check_latest"}, call("check_latest")).leaf=true
 end
 
 local uci = luci.model.uci.cursor()
@@ -429,6 +430,15 @@ local function core_version()
 	end
 end
 
+local function latest_core()
+	if nixio.fs.access("/usr/share/xclient/new_core") then
+		return luci.sys.exec("sed -n 1p /usr/share/xclient/new_core")
+	else
+		return "--"
+	end
+
+end
+
 local function geosite_version()
 	if nixio.fs.access("/usr/bin/geosite.dat") then
 		if nixio.fs.access("/usr/share/xclient/geosite_version") then
@@ -453,14 +463,10 @@ local function geoip_version()
 	end
 end
 
-local function new_core()
-	local c = luci.sys.exec(string.format("curl -sL -H 'Content-Type: application/json' -X GET https://api.github.com/repos/XTLS/Xray-core/releases/latest"))
-	if c then
-		local data = json.parse(c)
-		return data.tag_name
-	end	
-	return "--"
+function check_latest()
+	return luci.sys.exec("sh /usr/share/xclient/core_version.sh")
 end
+
 
 function check_version()
 	luci.http.prepare_content("application/json")
@@ -468,6 +474,6 @@ function check_version()
 	 core_version = core_version(),
 	 geoip_version = geoip_version(),
 	 geosite_version = geosite_version(),
-	 new_core = new_core()
+	 latest_core = latest_core()
 	})
 end

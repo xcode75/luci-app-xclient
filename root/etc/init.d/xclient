@@ -376,7 +376,7 @@ start_monitor() {
 	if [ $(uci_get_by_type global monitor_enable 1) == "1" ]; then
 		let total_count=redir_tcp+redir_udp+pdnsd_enable_flag
 		if [ $total_count -gt 0 ]; then
-			service_start /usr/bin/xmonitor $redir_tcp $redir_udp $pdnsd_enable_flag
+			service_start /usr/share/xclient/monitor.sh $redir_tcp $redir_udp $pdnsd_enable_flag
 		fi
 	fi
 }
@@ -389,7 +389,7 @@ start_rules() {
 		local udp_port=udp_port=$(uci_get_by_type global udp_port)
 	fi
 	
-	/usr/bin/xrules \
+	/usr/share/xclient/iptables.sh \
 		-s "$server" \
 		-l "$tcp_port" \
 		-S "$udp_server" \
@@ -447,12 +447,11 @@ stop() {
 	echo "Stopping Client" > $REAL_LOG
 	unlock
 	set_lock
-	/usr/bin/xrules -f
-	$PS -w | grep -v "grep" | grep xmonitor | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
-	$PS -w | grep -v "grep" | grep "sleep 0000" | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
+	/usr/share/xclient/iptables.sh -f
+	$PS -w | grep -v "grep" | grep monitor | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
 	$PS -w | grep -v "grep" | grep "$TMP_PATH" | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
-	killall -q -9 v2ray-plugin xray-plugin
-	rm -f /var/lock/xmonitor.lock
+	killall -q -9 xray-plugin
+	rm -f /var/lock/monitor.lock
 	if [ -f "/tmp/dnsmasq.d/dnsmasq-xclient.conf" ]; then
 		rm -rf /tmp/dnsmasq.d/dnsmasq-xclient.conf $TMP_DNSMASQ_PATH $TMP_PATH/*-xclient-*.json
 		/etc/init.d/dnsmasq restart >/dev/null 2>&1

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 . $IPKG_INSTROOT/etc/init.d/xclient
-LOCK_FILE="/var/lock/xmonitor.lock"
+LOCK_FILE="/var/lock/monitor.lock"
 [ -f "$LOCK_FILE" ] && exit 2
 touch "$LOCK_FILE"
 redir_tcp_process=$1
@@ -17,14 +17,14 @@ server_port=$(uci_get_by_name $GLOBAL_SERVER server_port)
 
 
 while [ "1" == "1" ]; do #死循环
-	sleep 000030s
+	sleep 1
 	#redir tcp
 	if [ "$redir_tcp_process" -gt 0 ]; then
 		icount=$(busybox ps -w | grep xclient-retcp | grep -v grep | wc -l)
 		if [ "$icount" == 0 ]; then
 			logger -t "$NAME" "xclient redir tcp error.restart!"
 			echolog "xclient redir tcp error.restart!"
-			/etc/init.d/xclient restart
+			/etc/init.d/xclient reload
 			exit 0
 		fi
 	fi
@@ -34,7 +34,7 @@ while [ "1" == "1" ]; do #死循环
 		if [ "$icount" == 0 ]; then
 			logger -t "$NAME" "xclient redir udp error.restart!"
 			echolog "xclient redir udp error.restart!"
-			/etc/init.d/xclient restart
+			/etc/init.d/xclient reload
 			exit 0
 		fi
 	fi
