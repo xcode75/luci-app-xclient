@@ -153,4 +153,10 @@ o.datatype = "port"
 o.default = 5351
 o.rmempty = false
 
+local apply = luci.http.formvalue("cbi.apply")
+if apply then
+  m.uci:commit("xclient")
+  luci.sys.call("/etc/init.d/xclient boot >/dev/null 2>&1 &")
+end
+
 return m
