@@ -44,7 +44,7 @@ until fn == nil
 local function direct_outbound()
     return {
         protocol = "freedom",
-		settings = {
+	settings = {
           domainStrategy = "UseIP"
         },
         tag = "direct"
@@ -67,8 +67,8 @@ local function dns_outbound()
     return {
         protocol = "dns",
         address = "1.1.1.1",
-		network = "tcp,udp",
-		port = 53,
+	network = "tcp,udp",
+	port = 53,
         tag = "dns_outbound"
     }
 end
@@ -132,8 +132,8 @@ local function stream_h2(server)
         return {
             path = server.h2_path,
             host = server.h2_host,
-			read_idle_timeout = tonumber(server.read_idle_timeout) or nil,
-			health_check_timeout = tonumber(server.health_check_timeout) or nil
+	    read_idle_timeout = tonumber(server.read_idle_timeout) or nil,
+	    health_check_timeout = tonumber(server.health_check_timeout) or nil
         }
     else
         return nil
@@ -184,8 +184,8 @@ local function stream_quic(server)
     if server.transport == "quic" then
         return {
             security = server.quic_security,
-			key = server.quic_key,
-			header = {type = server.quic_guise}
+	    key = server.quic_key,
+	    header = {type = server.quic_guise}
         }
     else
         return nil
@@ -212,9 +212,9 @@ end
 local function tls_settings(server)
     local result = {
         fingerprint = server.fingerprint,
-		rejectUnknownSni = (server.rejectUnknownSni == "1") and true or false,
-		allowInsecure = (server.insecure == "1") and true or false,
-		serverName = server.tls_host,
+	rejectUnknownSni = (server.rejectUnknownSni == "1") and true or false,
+	allowInsecure = (server.insecure == "1") and true or false,
+	serverName = server.tls_host,
     }
     if server.alpn ~= nil then
         local alpn = {}
@@ -228,10 +228,10 @@ end
 
 local function xtls_settings(server)
     local result = {
-	    fingerprint = server.fingerprint,
-		rejectUnknownSni = (server.rejectUnknownSni == "1") and true or false,
-		allowInsecure = (server.insecure == "1") and true or false,
-		serverName = server.tls_host,
+	fingerprint = server.fingerprint,
+	rejectUnknownSni = (server.rejectUnknownSni == "1") and true or false,
+	allowInsecure = (server.insecure == "1") and true or false,
+	serverName = server.tls_host,
     }
     if server.alpn ~= nil then
         local alpn = {}
@@ -262,16 +262,16 @@ local function shadowsocks_outbound(server, tag)
             security = (server.tls == '1') and "tls" or nil,
             tlsSettings = (server.tls == '1') and "tls" and tls_settings(server) or nil,
             quicSettings = stream_quic(server),
-			kcpSettings = stream_kcp(server),
+	    kcpSettings = stream_kcp(server),
             tcpSettings = stream_tcp(server) and server.protocol ~= "shadowsocks" or nil,
             wsSettings = stream_ws(server),
             grpcSettings = stream_grpc(server),
             httpSettings = stream_h2(server)
         },
-		mux = (server.mux == "1" and server.xtls ~= "1" and server.transport ~= "grpc") and {
-			enabled = true,
-			concurrency = tonumber(server.concurrency)
-		} or nil
+	mux = (server.mux == "1" and server.xtls ~= "1" and server.transport ~= "grpc") and {
+		enabled = true,
+		concurrency = tonumber(server.concurrency)
+	} or nil
     }
 end
 
@@ -302,8 +302,8 @@ local function vmess_outbound(server, tag)
             wsSettings = stream_ws(server),
             grpcSettings = stream_grpc(server),
             httpSettings = stream_h2(server),
-			quicSettings = stream_quic(server),
-			kcpSettings = stream_kcp(server),
+	    quicSettings = stream_quic(server),
+	    kcpSettings = stream_kcp(server),
         }
     }
 end
@@ -340,8 +340,8 @@ local function vless_outbound(server, tag)
             wsSettings = stream_ws(server),
             grpcSettings = stream_grpc(server),
             httpSettings = stream_h2(server),
-			quicSettings = stream_quic(server),
-			kcpSettings = stream_kcp(server),
+	    quicSettings = stream_quic(server),
+	    kcpSettings = stream_kcp(server),
         }
     }
 end
@@ -373,8 +373,8 @@ local function trojan_outbound(server, tag)
             wsSettings = stream_ws(server),
             grpcSettings = stream_grpc(server),
             httpSettings = stream_h2(server),
-			quicSettings = stream_quic(server),
-			kcpSettings = stream_kcp(server),
+	    quicSettings = stream_quic(server),
+	    kcpSettings = stream_kcp(server),
         },
 		mux = (server.mux == "1" and server.xtls ~= "1" and server.transport ~= "grpc") and {
 			enabled = true,
@@ -482,29 +482,10 @@ local function inbounds()
 		if proxy.socks5_server == "same" or _local == "1" then
 			table.insert(i, socks_inbound())
 		end
-        table.insert(i, {
-            listen = "127.0.0.1",
-            port = 8080,
-            protocol = "dokodemo-door",
-            settings = {
-                address = "127.0.0.1"
-            },
-            tag = "api"
-        })
 		return i
 	end
 end
 
-local function api()
-    return {
-        tag = "api",
-        services = {
-            "HandlerService",
-            "LoggerService",
-            "StatsService"
-        }
-    }
-end
 
 local function routing()
     local rule = {}
@@ -513,12 +494,12 @@ local function routing()
         i = i + 1
         table.insert(rule, {
             type = "field",
-			domainMatcher = v.domainMatcher or nil,
+	    domainMatcher = v.domainMatcher or nil,
             domain = v.domain or nil,
             ip = v.ip or nil,
             port = v.port or nil,
             sourcePort = v.sourcePort or nil,
-			network = v.network or nil,
+	    network = v.network or nil,
             source = v.source or nil,
             inboundTag = v.inboundTag or nil,
             protocol = v.protocol or nil,
@@ -608,31 +589,29 @@ end
 
 local xclient = {
     log = logging(),
-	dns = dns(),
-	api = api(),
-	policy = policy(),
-	routing = routing_rules(),
+    dns = dns(),
+    routing = routing_rules(),
     inbounds = inbounds(),
     outbounds = outbounds()    
 }
 
 
 local shadowsocks_plugin = {
-		server = node.server,
-		server_port = tonumber(node.server_port),
-		local_address = "0.0.0.0",
-		local_port = tonumber(local_port),
-		mode = (proto == "tcp,udp") and "tcp_and_udp" or proto .. "_only",
-		password = node.password,
-		method = node.encrypt_method_v2ray_ss,
-		reuse_port = true,
-		protocol = _protocol,
-		plugin = node.plugin,
-		plugin_opts = node.plugin_opts or nil
+    server = node.server,
+    server_port = tonumber(node.server_port),
+    local_address = "0.0.0.0",
+    local_port = tonumber(local_port),
+    mode = (proto == "tcp,udp") and "tcp_and_udp" or proto .. "_only",
+    password = node.password,
+    method = node.encrypt_method_v2ray_ss,
+    reuse_port = true,
+    protocol = _protocol,
+    plugin = node.plugin,
+    plugin_opts = node.plugin_opts or nil
 }
 
 if node.protocol == "shadowsocks-plugin" then
-	print(json.stringify(shadowsocks_plugin, true))
+    print(json.stringify(shadowsocks_plugin, true))
 else
-	print(json.stringify(xclient, true))
+    print(json.stringify(xclient, true))
 end
