@@ -138,5 +138,11 @@ end
 
 m:append(Template("xclient/server_list"))
 
+local apply = luci.http.formvalue("cbi.apply")
+if apply then
+  c.uci:commit("xclient")
+  m.uci:commit("xclient")
+  luci.sys.call("/etc/init.d/xclient boot >/dev/null 2>&1 &")
+end
 
 return c, m
