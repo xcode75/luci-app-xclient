@@ -482,10 +482,29 @@ local function inbounds()
 		if proxy.socks5_server == "same" or _local == "1" then
 			table.insert(i, socks_inbound())
 		end
+        table.insert(i, {
+            listen = "127.0.0.1",
+            port = 8080,
+            protocol = "dokodemo-door",
+            settings = {
+                address = "127.0.0.1"
+            },
+            tag = "api"
+        })
 		return i
 	end
 end
 
+local function api()
+    return {
+        tag = "api",
+        services = {
+            "HandlerService",
+            "LoggerService",
+            "StatsService"
+        }
+    }
+end
 
 local function routing()
     local rule = {}
@@ -564,9 +583,34 @@ local function logging()
     }
 end
 
+local function policy()
+    local stats = "1"
+    return {
+        levels = {
+            ["0"] = {
+                handshake = 5,
+                connIdle = 300,
+                uplinkOnly = 0,
+                downlinkOnly = 0,
+                bufferSize = 5,
+                statsUserUplink = stats,
+                statsUserDownlink = stats,
+            }
+        },
+        system = {
+            statsInboundUplink = stats,
+            statsInboundDownlink = stats,
+            statsOutboundUplink = stats,
+            statsOutboundDownlink = stats
+        }
+    }
+end
+
 local xclient = {
     log = logging(),
 	dns = dns(),
+	api = api(),
+	policy = policy(),
 	routing = routing_rules(),
     inbounds = inbounds(),
     outbounds = outbounds()    

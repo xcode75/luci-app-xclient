@@ -137,6 +137,7 @@ o:value("kcp", "mKCP")
 o:value("ws", "WebSocket")
 o:value("h2", "HTTP/2")
 o:value("grpc", "gRPC")
+o:value("quic", "QUIC")
 o.rmempty = true
 
 -- [[ TCP ]]--
@@ -273,6 +274,33 @@ o = s:option(Flag, "congestion", "Congestion")
 o:depends("transport", "kcp")
 o.rmempty = true
 
+-- [[ QUIC ]]--
+o = s.option(ListValue,"quic_security", "[quic] Security")
+o:depends("transport", "quic")
+o.default = "none"
+o:value("none", "none")
+o:value("aes-128-gcm", "aes-128-gcm")
+o:value("chacha20-poly1305", "chacha20-poly1305")
+o.rmempty = true
+
+
+o = s.option(Value, "quic_key", "[quic] Key")
+o:depends("transport", "quic")
+o.rmempty = true
+
+
+o = s.option(ListValue, "quic_guise", "[quic] Fake Header Type")
+o:depends("transport", "quic")
+o.default = "none"
+o:value("none", _("None"))
+o:value("srtp", _("VideoCall (SRTP)"))
+o:value("utp", _("BitTorrent (uTP)"))
+o:value("wechat-video", _("WechatVideo"))
+o:value("dtls", "DTLS 1.2")
+o:value("wireguard", "WireGuard")
+o.rmempty = true
+
+		
 -- [[ TLS ]]--
 o = s:option(Flag, "tls", "TLS")
 o.rmempty = true

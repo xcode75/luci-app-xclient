@@ -133,6 +133,11 @@ local function processData(szType, content)
 			result.h2_host = info.host
 			result.h2_path = info.path
 		end
+		if info.net == 'quic' then
+			result.quic_guise = "none"
+			result.quic_key = ""
+			result.quic_security = "none"
+		end
 		if info.net == 'grpc' then
 			result.serviceName = info.serviceName
 		end
@@ -316,7 +321,11 @@ local function processData(szType, content)
 				result.write_buffer_size = 2
 				result.seed = params.seed or ""
 			end
-			
+			if info.net == 'quic' then
+				result.quic_guise = "none"
+				result.quic_key = ""
+				result.quic_security = "none"
+			end
 			if params.type == 'grpc' then
 				result.serviceName = params.serviceName
 			end
@@ -346,7 +355,7 @@ local function processData(szType, content)
 end
 -- wget
 local function wget(url)
-	local stdout = luci.sys.exec('uclient-fetch -q --user-agent="luci-app-xclient/v1.0.0" --no-check-certificate -O- "' .. url .. '"')
+	local stdout = luci.sys.exec('uclient-fetch -q --user-agent="Luci-App-Xclient/OpenWRT-v2" --no-check-certificate -O- "' .. url .. '"')
 	return trim(stdout)
 end
 

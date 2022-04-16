@@ -326,7 +326,7 @@ end
 
 function geoloc()
     local geo, data
-	geo = luci.sys.exec(string.format("curl -sL -H 'User-Agent: luci-app-xclient' 'Content-Type: application/json'  -X GET https://geoip.gbxcloud.com/?lang=en"))
+	geo = luci.sys.exec(string.format("curl -sL -H 'User-Agent: luci-app-xclient' 'Content-Type: application/json'  -X GET https://query-geolocation.herokuapp.com/?lang=en"))
 	if geo then
 		data = json.parse(geo)
 	end	
