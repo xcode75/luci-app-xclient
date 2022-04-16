@@ -139,11 +139,12 @@ function o.cfgvalue(...)
 end
 
 
-
 local apply = luci.http.formvalue("cbi.apply")
 if apply then
-	y.uci:commit("xclient")
-	z.uci:commit("xclient")
+  y.uci:commit("xclient")
+  z.uci:commit("xclient")
+  luci.sys.call("/etc/init.d/xclient boot >/dev/null 2>&1 &")
 end
+
 
 return z, y
