@@ -54,6 +54,8 @@ function index()
 	
 	entry({"admin", "services", "xclient", "version"}, call("check_version")).leaf=true
 	entry({"admin", "services", "xclient", "check_latest"}, call("check_latest")).leaf=true
+	
+	entry({"admin", "services", "xclient", "stats"}, call("check_stats")).leaf=true
 end
 
 local uci = luci.model.uci.cursor()
@@ -193,7 +195,7 @@ function act_logout()
 				end
 			end)
 			uci:commit("xclient") 
-			luci.sys.call("/etc/init.d/xclient restart &")
+			luci.sys.call("/etc/init.d/xclient boot &")
 			luci.http.write_json({logout = 1;})
 		else
 			luci.http.write_json({logout = 0;})
@@ -475,5 +477,37 @@ function check_version()
 	 geoip_version = geoip_version(),
 	 geosite_version = geosite_version(),
 	 latest_core = latest_core()
+	})
+end
+
+function check_stats()
+	check_downlink = luci.sys.exec("$(xray api stats --server=127.0.0.1:8888 -name \"outbound>>>proxy_outbound>>>traffic>>>downlink\")")
+	check_uplink = luci.sys.exec("$(xray api stats --server=127.0.0.1:8888 -name \"outbound>>>proxy_outbound>>>traffic>>>uplink\")")
+	if check_uplink then
+	    up = json.parse(check_uplink)
+		if up.stat.value then
+			local uplink = up.stat.value
+		else
+			local uplink = 0
+		end
+	else
+		local uplink = 0
+	end	
+	
+	if check_downlink then
+	    down = json.parse(check_downlink)
+		if down.stat.value then
+			local downlink = down.stat.value
+		else
+			local downlink = 0
+		end
+	else
+		local downlink = 0
+	end	
+	
+	luci.http.prepare_content("application/json")
+	luci.http.write_json({
+		downlink = downlink,
+		uplink = uplink
 	})
 end

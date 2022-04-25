@@ -332,6 +332,13 @@
 		</div>
 </fieldset>
 
+<fieldset  class="cbi-section">
+	<table width="100%" cellspacing="10">
+		<tr><td width="25%" ><span></span></td ><td width="45%" ><span>UPL SPEED%></span></td >  <td ><b><span> ↑ </span>  <span id="_speed_upload">0 B/s</span></b></td></tr>
+		<tr><td width="25%" ><span></span></td ><td width="45%" ><span>DNL SPEED%></span></td >  <td ><b><span> ↓ </span>  <span id="_speed_download">0 B/s</span></b></td></tr>
+	</table>
+</fieldset>
+
 <script type="text/javascript">//<![CDATA[	
 		const _IMG = '/luci-static/xclient/';		
 		var xclient = document.getElementById('_xclient');	   
@@ -408,6 +415,32 @@
 				wirte(status);
 			}
 		);
+		
+		XHR.poll(1, '<%=luci.dispatcher.build_url("admin", "services", "xclient", "stats")%>', null, function(x, status)
+		{
+				traffic(status.downlink, status.uplink);
+		});
+		
+		function traffic(downlink, uplink) {
+			var uplspd = stats(uplink);
+			var dnlspd = stats(downlink);			
+			document.getElementById('_speed_upload').innerHTML = uplspd;
+			document.getElementById('_speed_download').innerHTML = dnlspd;
+		}
+		
+		function stats(value) {
+			if (value > 1099511627776) {
+				return Math.round(value/1099511627776) + " TB/s"
+			} else if (value > 1073741824) {
+				return Math.round(value/1073741824) + " GB/s"
+			} else if (value > 1048576) {
+				return Math.round(value/1048576) + " MB/s"
+			} else if( value > 1024) {
+				return Math.round(value/1024) + " KB/s"
+			} else {
+				return Math.round(value) + " B/s"
+			}
+		}		
 //]]></script>
 
 

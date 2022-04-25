@@ -482,10 +482,33 @@ local function inbounds()
 		if proxy.socks5_server == "same" or _local == "1" then
 			table.insert(i, socks_inbound())
 		end
+        table.insert(i, {
+            listen = "127.0.0.1",
+            port = 8888,
+            protocol = "dokodemo-door",
+            settings = {
+                address = "127.0.0.1"
+            },
+            tag = "api"
+        })
 		return i
 	end
 end
 
+local function api()
+    return {
+        tag = "api",
+        services = {
+            "StatsService"
+        }
+    }
+end
+
+
+local function stats()
+    return {}
+    }
+end
 
 local function routing()
     local rule = {}
@@ -506,6 +529,14 @@ local function routing()
             outboundTag = v.outboundTag or nil,
         })
     end)
+	table.insert(rule, {
+        type =  "field",
+        inboundTag = {
+			"api"
+		},
+        outboundTag = "api",
+        enabled = true
+    })
     return rule    
 end
 
@@ -565,7 +596,6 @@ local function logging()
 end
 
 local function policy()
-    local stats = "1"
     return {
         levels = {
             ["0"] = {
@@ -574,15 +604,15 @@ local function policy()
                 uplinkOnly = 0,
                 downlinkOnly = 0,
                 bufferSize = 5,
-                statsUserUplink = stats,
-                statsUserDownlink = stats,
+                statsUserUplink = true,
+                statsUserDownlink = true,
             }
         },
         system = {
-            statsInboundUplink = stats,
-            statsInboundDownlink = stats,
-            statsOutboundUplink = stats,
-            statsOutboundDownlink = stats
+            statsInboundUplink = true,
+            statsInboundDownlink = true,
+            statsOutboundUplink = true,
+            statsOutboundDownlink = true
         }
     }
 end
@@ -591,6 +621,11 @@ local xclient = {
     log = logging(),
     dns = dns(),
     routing = routing_rules(),
+	dns = dns(),
+	api = api(),
+	stats = stats(),
+	policy = policy(),
+	routing = routing_rules(),
     inbounds = inbounds(),
     outbounds = outbounds()    
 }
