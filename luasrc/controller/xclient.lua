@@ -55,7 +55,7 @@ function index()
 	entry({"admin", "services", "xclient", "version"}, call("check_version")).leaf=true
 	entry({"admin", "services", "xclient", "check_latest"}, call("check_latest")).leaf=true
 	
-	entry({"admin", "services", "xclient", "stats"}, call("check_stats")).leaf=true
+	entry({"admin", "services", "xclient", "traffic"}, call("statistics")).leaf=true
 end
 
 local uci = luci.model.uci.cursor()
@@ -480,32 +480,44 @@ function check_version()
 	})
 end
 
-function check_stats()
-	check_downlink = luci.sys.exec("$(xray api stats --server=127.0.0.1:8888 -name \"outbound>>>proxy_outbound>>>traffic>>>downlink\")")
-	check_uplink = luci.sys.exec("$(xray api stats --server=127.0.0.1:8888 -name \"outbound>>>proxy_outbound>>>traffic>>>uplink\")")
+function statistics()
+	luci.http.prepare_content("application/json")
+	
+    local up, check_uplink
+	check_uplink = luci.sys.exec(string.format("xray api stats --server=127.0.0.1:8888 -name \"outbound>>>proxy_outbound>>>traffic>>>uplink\"")) 
 	if check_uplink then
 	    up = json.parse(check_uplink)
-		if up.stat.value then
-			local uplink = up.stat.value
-		else
+        if up ~= nil then
+			if up.stat.value ~= nil then
+				local uplink = up.stat.value 
+			else
+				local uplink = 0
+			end
+        else
 			local uplink = 0
-		end
+	    end	
 	else
 		local uplink = 0
 	end	
-	
+
+    local down, check_downlink
+	check_downlink = luci.sys.exec(string.format("xray api stats --server=127.0.0.1:8888 -name \"outbound>>>proxy_outbound>>>traffic>>>downlink\""))
 	if check_downlink then
 	    down = json.parse(check_downlink)
-		if down.stat.value then
-			local downlink = down.stat.value
-		else
+        if down ~= nil then
+			if down.stat.value ~= nil then
+				local downlink = down.stat.value
+			else
+				local downlink = 0 
+			end
+        else
 			local downlink = 0
-		end
+	    end	
+
 	else
 		local downlink = 0
-	end	
-	
-	luci.http.prepare_content("application/json")
+	end
+
 	luci.http.write_json({
 		downlink = downlink,
 		uplink = uplink

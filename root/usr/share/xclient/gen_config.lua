@@ -505,11 +505,6 @@ local function api()
 end
 
 
-local function stats()
-    return {}
-    }
-end
-
 local function routing()
     local rule = {}
     local i = 0
@@ -597,20 +592,7 @@ end
 
 local function policy()
     return {
-        levels = {
-            ["0"] = {
-                handshake = 5,
-                connIdle = 300,
-                uplinkOnly = 0,
-                downlinkOnly = 0,
-                bufferSize = 5,
-                statsUserUplink = true,
-                statsUserDownlink = true,
-            }
-        },
         system = {
-            statsInboundUplink = true,
-            statsInboundDownlink = true,
             statsOutboundUplink = true,
             statsOutboundDownlink = true
         }
@@ -623,7 +605,6 @@ local xclient = {
     routing = routing_rules(),
 	dns = dns(),
 	api = api(),
-	stats = stats(),
 	policy = policy(),
 	routing = routing_rules(),
     inbounds = inbounds(),

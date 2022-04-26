@@ -241,6 +241,7 @@ start_udp() {
 		;;
     shadowsocks|vless|vmess|trojan)
 		gen_config_file $UDP_RELAY_SERVER 2 $udp_port 0 $type
+		sed -i "2i\  \"stats\": {}," $udp_config_file 2>/dev/null
 		$XBIN -config $udp_config_file > $XRAY_LOG_FILE 2>&1 &
 		echolog "UDP TPROXY Relay:$($(first_type "xray" "xray") -version | head -1) Started!"
 		;;
@@ -261,6 +262,7 @@ start_local() {
     shadowsocks|vless|vmess|trojan)
 		if [ "$_local" == "2" ]; then
 			gen_config_file $LOCAL_SERVER 4 0 $socks_port 1 $type
+			sed -i "2i\  \"stats\": {}," $local_config_file 2>/dev/null
 			$XBIN -config $local_config_file > $XRAY_LOG_FILE 2>&1 &
 			echolog "Global_Socks5:$($(first_type "xray" "xray") -version | head -1) Started!"
 		fi
@@ -288,6 +290,7 @@ Start_Run() {
 		;;
     shadowsocks|vless|vmess|trojan)
 		gen_config_file $GLOBAL_SERVER 1 $tcp_port $socks_port 0 $type
+		sed -i "2i\  \"stats\": {}," $tcp_config_file 2>/dev/null
 		$XBIN -config $tcp_config_file > $XRAY_LOG_FILE 2>&1 &
 		echolog "Main node:$($(first_type xray xray) -version | head -1) Started!"
 		;;

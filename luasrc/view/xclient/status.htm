@@ -334,10 +334,10 @@
 
 <fieldset  class="cbi-section">
 	<table width="100%" cellspacing="10">
-		<tr><td width="25%" ><span></span></td ><td width="45%" ><span>UPL SPEED%></span></td >  <td ><b><span> ↑ </span>  <span id="_speed_upload">0 B/s</span></b></td></tr>
-		<tr><td width="25%" ><span></span></td ><td width="45%" ><span>DNL SPEED%></span></td >  <td ><b><span> ↓ </span>  <span id="_speed_download">0 B/s</span></b></td></tr>
+		<tr><td width="25%" ><span></span></td ><td width="30%" ><b><span> ↓ </span>  <span id="_speed_download">0 B/s</span></b></td >  <td ><b><span> ↑ </span>  <span id="_speed_upload">0 B/s</span></b></td></tr>
 	</table>
 </fieldset>
+
 
 <script type="text/javascript">//<![CDATA[	
 		const _IMG = '/luci-static/xclient/';		
@@ -416,7 +416,7 @@
 			}
 		);
 		
-		XHR.poll(1, '<%=luci.dispatcher.build_url("admin", "services", "xclient", "stats")%>', null, function(x, status)
+		XHR.poll(2, '<%=luci.dispatcher.build_url("admin", "services", "xclient", "traffic")%>', null, function(x, status)
 		{
 				traffic(status.downlink, status.uplink);
 		});
