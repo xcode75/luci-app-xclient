@@ -1,4 +1,8 @@
 on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - main
   release:
     types:
       - created
@@ -6,7 +10,7 @@ on:
 name: luci-app-xclient
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       URL: https://downloads.openwrt.org/snapshots/targets/x86/64/openwrt-sdk-x86-64_gcc-11.2.0_musl.Linux-x86_64.tar.xz
       REPF: ${{ github.repository }}
