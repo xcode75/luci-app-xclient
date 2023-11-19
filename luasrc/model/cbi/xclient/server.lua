@@ -21,10 +21,8 @@ local encrypt_methods_v2ray_ss = {
 	"chacha20-poly1305",
 	"chacha20-ietf-poly1305",
 	"xchacha20-ietf-poly1305",
-	"aead_aes_128_gcm",
-	"aead_aes_256_gcm",
-	"aead_chacha20_poly1305",
-	"aead_xchacha20_poly1305"
+	"2022-blake3-aes-128-gcm",
+	"2022-blake3-aes-256-gcm"
 }
 
 local securitys = {
@@ -36,12 +34,8 @@ local securitys = {
 
 local flows = {
 	-- xlts
-	"xtls-rprx-origin",
-	"xtls-rprx-origin-udp443",
-	"xtls-rprx-direct",
-	"xtls-rprx-direct-udp443",
-	"xtls-rprx-splice",
-	"xtls-rprx-splice-udp443"
+	"xtls-rprx-vision",
+	"xtls-rprx-vision-udp443"
 }
 
 m = Map("xclient", "Add/Edit Server")
@@ -123,7 +117,7 @@ o.rmempty = true
 o.default = "none"
 o:depends({protocol = "vless"})
 
-o = s:option(ListValue, "security", "Encrypt Method")
+o = s:option(ListValue, "vmess_encryption", "Encrypt Method")
 for _, v in ipairs(securitys) do
 	o:value(v, v:upper())
 end
@@ -301,25 +295,13 @@ o:value("wireguard", "WireGuard")
 o.rmempty = true
 
 		
--- [[ TLS ]]--
-o = s:option(Flag, "tls", "TLS")
-o.rmempty = true
-o.default = "0"
-o:depends({protocol = "vmess",xtls = false})
-o:depends({protocol = "trojan" ,xtls = false})
-o:depends({protocol = "vless",xtls = false})
---o:depends({xtls = false})
-
--- XTLS
-if is_finded("xray") then
-	o = s:option(Flag, "xtls", "XTLS")
-	o.rmempty = true
-	o.default = "0"
-	o:depends({protocol = "vless", transport = "tcp", tls = false})
-	o:depends({protocol = "vless", transport = "kcp", tls = false})
-	o:depends({protocol = "trojan", transport = "tcp", tls = false})
-	o:depends({protocol = "trojan", transport = "kcp", tls = false})
-end
+-- [[ security ]]--
+o = s:option(ListValue, "security", "Security")
+o.default = "none"
+o:value("none", "none")
+o:value("tls", "tls")
+o:value("reality", "reality")
+o.rmempty = false
 
 -- Flow
 o = s:option(Value, "vless_flow", "Flow")
@@ -327,26 +309,23 @@ for _, v in ipairs(flows) do
 	o:value(v, v)
 end
 o.rmempty = true
-o.default = "xtls-rprx-direct"
-o:depends("xtls", true)
+o.default = "xtls-rprx-vision"
+o:depends({protocol = "vless", transport = "tcp"})
 
-o = s:option(Value, "tls_host", "TLS Host")
+o = s:option(Value, "tls_host", "TLS Host / serverName")
 o.datatype = "hostname"
-o:depends("tls", true)
-o:depends("xtls", true)
+o:depends({security = 'tls', security = 'reality'})
 o.rmempty = true
 
 o = s:option(Flag, "rejectUnknownSni", "Reject Unknown Sni")
-o:depends("tls", true)
-o:depends("xtls", true)
+o:depends({security = 'tls'})
 o.rmempty = true
 
 -- [[ Alpn ]]--
 o = s:option(DynamicList, "alpn", "Alpn")
 o:value("h2", "h2")
 o:value("http/1.1", "http/1.1")
-o:depends("tls", true)
-o:depends("xtls", true)
+o:depends({security = 'tls'})
 o.rmempty = true
 
 -- [[ uTLS ]]--
@@ -356,22 +335,37 @@ o:value("firefox", "firefox")
 o:value("chrome", "chrome")
 o:value("safari", "safari")
 o:value("randomized", "randomized")
-o:depends({tls = true})
+o:depends({security = 'tls', security = 'reality'})
+o.default = "chrome"
+o.rmempty = true
+
+-- [[ ShortId ]]--
+o = s:option(Value, "shortId", "ShortId")
 o.default = ""
+o:depends({security = 'reality'})
+o.rmempty = true
+
+-- [[ publicKey ]]--
+o = s:option(Value, "publicKey", "publicKey")
+o.default = ""
+o:depends({security = 'reality'})
+o.rmempty = true
+
+-- [[ spiderX ]]--
+o = s:option(Value, "spiderX", "spiderX")
+o.default = ""
+o:depends({security = 'reality'})
 o.rmempty = true
 
 -- [[ allowInsecure ]]--
 o = s:option(Flag, "insecure", "AllowInsecure")
 o.rmempty = true
-o:depends("tls", true)
-o:depends("xtls", true)
+o:depends({security = 'tls'})
 
 -- [[ Mux ]]--
 o = s:option(Flag, "mux", "Mux")
 o.rmempty = true
-o:depends({protocol = "vmess",xtls = false})
-o:depends({protocol = "trojan" ,xtls = false})
-o:depends({protocol = "vless",xtls = false})
+o:depends({protocol = "shadowsocks"})
 
 o = s:option(Value, "concurrency", "Concurrency")
 o.datatype = "uinteger"

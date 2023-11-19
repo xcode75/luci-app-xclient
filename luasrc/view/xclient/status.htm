@@ -317,7 +317,7 @@
 </fieldset>
 
 
-<fieldset  class="cbi-section">
+<!--<fieldset  class="cbi-section">
 		<div class="pure-u-24-24" >
 			<div class="block pure-g">
 				<div class="pure-u-2-24">
@@ -330,7 +330,7 @@
 				</div>
 			</div>
 		</div>
-</fieldset>
+</fieldset>-->
 
 <fieldset  class="cbi-section">
 	<table width="100%" cellspacing="10">
@@ -382,21 +382,21 @@
 				state(status);
 			}
 		);
+		//
+		//XHR.get('<%=luci.dispatcher.build_url("admin", "services", "xclient", "geolocation")%>', null, function(x, status) {
+		//		if(x && x.status == 200) {
+		//			document.getElementById('ip').innerHTML = "<span class='green'>" + status.location + "</span>";
+		//		}
+		//	}
+		//);
 		
-		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "xclient", "geolocation")%>', null, function(x, status) {
-				if(x && x.status == 200) {
-					document.getElementById('ip').innerHTML = "<span class='green'>" + status.location + "</span>";
-				}
-			}
-		);
-		
-		XHR.poll(3,'<%=luci.dispatcher.build_url("admin", "services", "xclient", "geolocation")%>', null, function(x, status) {
-				if(x && x.status == 200) {
-					document.getElementById('ip').innerHTML = "<span class='green'>" + status.location + "</span>";
-				}
-			}	
-		);
-
+		//XHR.poll(3,'<%=luci.dispatcher.build_url("admin", "services", "xclient", "geolocation")%>', null, function(x, status) {
+		//		if(x && x.status == 200) {
+		//			document.getElementById('ip').innerHTML = "<span class='green'>" + status.location + "</span>";
+		//		}
+		//	}	
+		//);
+		//
 		function wirte(status) {
 			status.baidu ? $(".baidu").attr("src", _IMG + "img/site_icon_01.png") : $(".baidu").attr("src", _IMG + "img/site_icon1_01.png");
 			status.baidu ? document.getElementById('status_baidu').innerHTML = '<b class="green">NORMAL</b>' : document.getElementById('status_baidu').innerHTML = '<b class="red">NO ACCESS</b>';

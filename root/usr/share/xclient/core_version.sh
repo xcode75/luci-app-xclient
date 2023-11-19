@@ -4,7 +4,7 @@ if [ "$?" -eq "0" ]; then
 rm -rf /usr/share/xclient/core_version
 if [ $cur_core_version ]; then
 echo $cur_core_version > /usr/share/xclient/core_version 2>&1 & >/dev/null
-elif [ $cur_core_version =="" ]; then
+elif [ $cur_core_version == "" ]; then
 echo "--" > /usr/share/xclient/core_version 2>&1 & >/dev/null
 fi
 fi
@@ -16,7 +16,7 @@ if [ "$?" -eq "0" ]; then
 rm -rf /usr/share/xclient/new_core
 if [ $new_core_version ]; then
 echo $new_core_version > /usr/share/xclient/new_core 2>&1 & >/dev/null
-elif [ $new_core_version =="" ]; then
+elif [ $new_core_version == "" ]; then
 echo 0 > /usr/share/xclient/new_core 2>&1 & >/dev/null
 fi
 fi

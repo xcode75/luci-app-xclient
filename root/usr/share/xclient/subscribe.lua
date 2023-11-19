@@ -163,11 +163,11 @@ local function processData(szType, content)
 			result.security = info.security
 		end
 		if info.tls == "tls" or info.tls == "1" then
-			result.tls = "1"
+			result.security = "tls"
 			result.tls_host = info.sni
 			result.insecure = 1
 		else
-			result.tls = "0"
+			result.security = "none"
 		end
 	elseif szType == "ss" then
 		local idx_sp = 0
@@ -236,13 +236,10 @@ local function processData(szType, content)
 				params[t[1]] = t[2]
 			end
 			
-			if params.obfs == "grpc" and params.security == "xtls" then
-				result.xtls = "1"
-				result.tls = "0"
-				result.vless_flow = params.flow
+			if params.obfs == "grpc" and params.security == "none" then
+				result.security = "none"
 			else
-				result.xtls = "0"
-				result.tls = "1"
+				result.security = "tls"
 			end
 			
 			if params.sni then
@@ -295,13 +292,7 @@ local function processData(szType, content)
 			result.vless_encryption = params.encryption or "none"
 			result.transport = params.type and (params.type == 'http' and 'h2' or params.type) or "tcp"
 			if not params.type or params.type == "tcp" then
-				if params.security == "xtls" then
-					result.xtls = "1"
-					result.tls_host = params.sni
-					result.vless_flow = params.flow
-				else
-					result.xtls = "0"
-				end
+				result.vless_flow = params.flow
 			end
 			if params.type == 'ws' then
 				result.ws_host = params.host
@@ -330,10 +321,17 @@ local function processData(szType, content)
 				result.serviceName = params.serviceName
 			end
 			if params.security == "tls" then
-				result.tls = "1"
+				result.security = "tls"
 				result.tls_host = params.sni
+			elseif params.security == "reality" then
+				result.security = "reality"	
+				result.tls_host = params.sni
+				result.publicKey = params.publicKey
+				result.shortId = params.shortId
+				result.fingerprint = params.fingerprint
+				result.spiderX = params.spiderX
 			else
-				result.tls = "0"
+				result.security = "none"
 			end
 		else
 			result.server_port = host[2]
@@ -355,7 +353,7 @@ local function processData(szType, content)
 end
 -- wget
 local function wget(url)
-	local stdout = luci.sys.exec('uclient-fetch -q --user-agent="Luci-App-Xclient/OpenWRT-v2" --no-check-certificate -O- "' .. url .. '"')
+	local stdout = luci.sys.exec('uclient-fetch -q --user-agent="Luci-app-xclient/OpenWRT" --no-check-certificate -O- "' .. url .. '"')
 	return trim(stdout)
 end
 

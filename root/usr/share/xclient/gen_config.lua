@@ -212,9 +212,9 @@ end
 local function tls_settings(server)
     local result = {
         fingerprint = server.fingerprint,
-	rejectUnknownSni = (server.rejectUnknownSni == "1") and true or false,
-	allowInsecure = (server.insecure == "1") and true or false,
-	serverName = server.tls_host,
+        rejectUnknownSni = (server.rejectUnknownSni == "1") and true or false,
+        allowInsecure = (server.insecure == "1") and true or false,
+        serverName = server.tls_host,
     }
     if server.alpn ~= nil then
         local alpn = {}
@@ -226,20 +226,14 @@ local function tls_settings(server)
     return result
 end
 
-local function xtls_settings(server)
+local function reality_settings(server)
     local result = {
-	fingerprint = server.fingerprint,
-	rejectUnknownSni = (server.rejectUnknownSni == "1") and true or false,
-	allowInsecure = (server.insecure == "1") and true or false,
-	serverName = server.tls_host,
+        fingerprint = server.fingerprint,
+        shortId = server.shortId,
+        publicKey = server.publicKey,
+        serverName = server.tls_host,
+        spiderX = server.spiderX,
     }
-    if server.alpn ~= nil then
-        local alpn = {}
-        for _, x in ipairs(server.alpn) do
-            table.insert(alpn, x)
-        end
-        result["alpn"] = alpn
-    end
     return result
 end
 
@@ -259,16 +253,16 @@ local function shadowsocks_outbound(server, tag)
         },
         streamSettings = {
             network = server.transport,
-            security = (server.tls == '1') and "tls" or nil,
-            tlsSettings = (server.tls == '1') and "tls" and tls_settings(server) or nil,
+            security = (server.security == 'tls') and "tls" or "none",
+            tlsSettings = (server.security == 'tls')  and "tls" and tls_settings(server) or nil,
             quicSettings = stream_quic(server),
-	    kcpSettings = stream_kcp(server),
+            kcpSettings = stream_kcp(server),
             tcpSettings = stream_tcp(server) and server.protocol ~= "shadowsocks" or nil,
             wsSettings = stream_ws(server),
             grpcSettings = stream_grpc(server),
             httpSettings = stream_h2(server)
         },
-	mux = (server.mux == "1" and server.xtls ~= "1" and server.transport ~= "grpc") and {
+	mux = (server.mux == "1" and server.security == 'tls' or server.security == 'none') and {
 		enabled = true,
 		concurrency = tonumber(server.concurrency)
 	} or nil
@@ -288,7 +282,7 @@ local function vmess_outbound(server, tag)
                         {
                             id = server.vmess_id,
                             alterId = 0,
-                            security = server.security
+                            security = server.vmess_encryption
                         }
                     }
                 }
@@ -296,14 +290,14 @@ local function vmess_outbound(server, tag)
         },
         streamSettings = {
             network = server.transport,
-            security = (server.xtls == '1') and "xtls" or (server.tls == '1') and "tls" or nil,
-            tlsSettings = (server.tls == '1') and "tls"  and tls_settings(server) or nil,
+            security = (server.security == 'tls') and "tls" or "none",
+            tlsSettings = (server.security == 'tls')  and "tls" and tls_settings(server) or nil,
             tcpSettings = stream_tcp(server),
             wsSettings = stream_ws(server),
             grpcSettings = stream_grpc(server),
             httpSettings = stream_h2(server),
-	    quicSettings = stream_quic(server),
-	    kcpSettings = stream_kcp(server),
+            quicSettings = stream_quic(server),
+            kcpSettings = stream_kcp(server),
         }
     }
 end
@@ -333,15 +327,15 @@ local function vless_outbound(server, tag)
         },
         streamSettings = {
             network = server.transport,
-            security = (server.xtls == '1') and "xtls" or (server.tls == '1') and "tls" or nil,
-            tlsSettings = (server.xtls == '1') and "xtls" or (server.tls == '1')  and "tls" and tls_settings(server) or nil,
-            xtlsSettings = server.vless_security == "xtls" and xtls_settings(server) or nil,
+            security = (server.security == 'reality')  and "reality" or (server.security == 'tls') and "tls" or "none",
+            tlsSettings = (server.security == 'tls')  and "tls" and tls_settings(server) or nil,
+            realitySettings = (server.security == 'reality')  and "reality" and reality_settings(server) or nil,
             tcpSettings = stream_tcp(server),
             wsSettings = stream_ws(server),
             grpcSettings = stream_grpc(server),
             httpSettings = stream_h2(server),
-	    quicSettings = stream_quic(server),
-	    kcpSettings = stream_kcp(server),
+            quicSettings = stream_quic(server),
+            kcpSettings = stream_kcp(server),
         }
     }
 end
@@ -366,17 +360,16 @@ local function trojan_outbound(server, tag)
         },
         streamSettings = {
             network = server.transport,
-            security = (server.xtls == '1') and "xtls" or (server.tls == '1') and "tls" or nil,
-            tlsSettings = (server.xtls == '1') and "xtls" or (server.tls == '1')  and "tls" and tls_settings(server) or nil,
-            xtlsSettings = server.trojan_security == "xtls" and xtls_settings(server) or nil,
+            security = (server.security == 'tls') and "tls" or "none",
+            tlsSettings = (server.security == 'tls')  and "tls" and tls_settings(server) or nil,
             tcpSettings = stream_tcp(server) and server.protocol ~= "trojan" or nil,
             wsSettings = stream_ws(server),
             grpcSettings = stream_grpc(server),
             httpSettings = stream_h2(server),
-	    quicSettings = stream_quic(server),
-	    kcpSettings = stream_kcp(server),
+            quicSettings = stream_quic(server),
+            kcpSettings = stream_kcp(server),
         },
-		mux = (server.mux == "1" and server.xtls ~= "1" and server.transport ~= "grpc") and {
+		mux = (server.mux == "1" and server.security == 'tls' or server.security == 'none') and {
 			enabled = true,
 			concurrency = tonumber(server.concurrency)
 		} or nil
@@ -517,7 +510,7 @@ local function routing()
             ip = v.ip or nil,
             port = v.port or nil,
             sourcePort = v.sourcePort or nil,
-	    network = v.network or nil,
+            network = v.network or nil,
             source = v.source or nil,
             inboundTag = v.inboundTag or nil,
             protocol = v.protocol or nil,
